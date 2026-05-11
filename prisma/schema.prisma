@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("TENANT") // ADMIN, TENANT
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  meters    Meter[]
+  invoices  Invoice[]
+}
+
+model Meter {
+  id        String   @id // Modbus ID / Serial Number (e.g. "M-101")
+  name      String
+  floor     Int
+  userId    String?  // Can be null if meter is not assigned
+  user      User?    @relation(fields: [userId], references: [id])
+  status    String   @default("ACTIVE") // ACTIVE, INACTIVE, ERROR
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  readings  MeterReading[]
+}
+
+model MeterReading {
+  id        String   @id @default(uuid())
+  meterId   String
+  meter     Meter    @relation(fields: [meterId], references: [id])
+  kwhValue  Float
+  timestamp DateTime @default(now())
+
+  @@index([meterId, timestamp])
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  month       Int
+  year        Int
+  startKwh    Float
+  endKwh      Float
+  totalKwh    Float
+  rate        Float
+  adminFee    Float
+  totalAmount Float
+  status      String   @default("UNPAID") // UNPAID, PAID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Settings {
+  id          String   @id @default("default")
+  ratePerKwh  Float    @default(1500.0)
+  adminFee    Float    @default(50000.0)
+  updatedAt   DateTime @updatedAt
+}
