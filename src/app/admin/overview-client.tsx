@@ -120,7 +120,7 @@ export default function OverviewClient({ stats }: { stats: any }) {
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} dx={-10} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: number) => [`${value} kWh`, 'Pemakaian']}
+                  formatter={(value) => [`${value ?? 0} kWh`, 'Pemakaian']}
                 />
                 <Line 
                   type="monotone" 
@@ -147,7 +147,7 @@ export default function OverviewClient({ stats }: { stats: any }) {
                 <Tooltip 
                   cursor={{ fill: 'transparent' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: number) => [`${value} kWh`, 'Total']}
+                  formatter={(value) => [`${value ?? 0} kWh`, 'Total']}
                 />
                 <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
