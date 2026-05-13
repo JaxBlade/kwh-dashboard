@@ -165,7 +165,7 @@ export default function OverviewClient({ stats }: { stats: any }) {
                   cursor={{ fill: 'rgba(79, 70, 229, 0.05)' }}
                   contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)', color: '#fff' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
-                  formatter={(value) => [`${value ?? 0} kWh`, 'Total']}
+                  formatter={(value) => [`${value ?? 0} kWh`, 'Pemakaian']}
                 />
                 <Bar dataKey="value" fill="#6366f1" radius={[6, 6, 0, 0]} />
               </BarChart>
