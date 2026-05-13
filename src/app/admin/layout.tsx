@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -41,33 +40,35 @@ export default function AdminLayout({
   }, []);
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col md:flex-row relative selection:bg-indigo-500/30">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-neutral-900/80 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm md:hidden transition-opacity"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        fixed inset-y-0 left-0 z-50 w-72 bg-white/70 dark:bg-slate-900/50 backdrop-blur-xl border-r border-slate-200/60 dark:border-slate-800/60 transform transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] md:relative md:translate-x-0 flex flex-col
+        ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
       `}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-neutral-200 dark:border-neutral-800">
-          <a href="/admin" className="flex items-center gap-2 text-blue-600 dark:text-blue-500 font-bold text-xl">
-            <Zap className="h-6 w-6" />
+        <div className="h-20 flex items-center justify-between px-8 border-b border-slate-200/60 dark:border-slate-800/60">
+          <a href="/admin" className="flex items-center gap-3 text-indigo-600 dark:text-indigo-400 font-extrabold text-xl tracking-tight group">
+            <div className="p-2 bg-indigo-600 rounded-lg shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+              <Zap className="h-5 w-5 text-white" />
+            </div>
             <span>PowerPanel</span>
           </a>
-          <button className="md:hidden text-neutral-500" onClick={() => setSidebarOpen(false)}>
+          <button className="md:hidden text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" onClick={() => setSidebarOpen(false)}>
             <X className="h-6 w-6" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
-          <p className="px-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">
-            Admin Menu
+        <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1 scrollbar-hide">
+          <p className="px-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">
+            Main Menu
           </p>
           {navigation.map((item) => {
             const isActive = pathname === item.href;
@@ -76,56 +77,61 @@ export default function AdminLayout({
                 key={item.name}
                 href={item.href}
                 className={`
-                  flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                  flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group
                   ${isActive 
-                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' 
-                    : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
+                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm ring-1 ring-indigo-500/10' 
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
                   }
                 `}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? 'text-blue-700 dark:text-blue-400' : 'text-neutral-400'}`} />
+                <item.icon className={`h-5 w-5 transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 group-hover:text-indigo-500'}`} />
                 {item.name}
               </a>
             )
           })}
         </div>
 
-        <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2">
+        <div className="p-6 border-t border-slate-200/60 dark:border-slate-800/60 space-y-3">
           {mounted && (
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-colors"
+              className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all duration-200 group"
             >
-              {theme === 'dark' ? <Sun className="h-5 w-5 text-neutral-400" /> : <Moon className="h-5 w-5 text-neutral-400" />}
+              {theme === 'dark' ? <Sun className="h-5 w-5 text-slate-400 group-hover:text-amber-500 transition-colors" /> : <Moon className="h-5 w-5 text-slate-400 group-hover:text-indigo-500 transition-colors" />}
               {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             </button>
           )}
           <a
             href="/"
-            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all duration-200 group"
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5 text-rose-500/70 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors" />
             Logout
           </a>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        {/* Decorative Background Blob for Main Content */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-400/5 dark:bg-indigo-500/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+
         {/* Mobile Header */}
-        <div className="md:hidden h-16 flex items-center justify-between px-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
-          <a href="/admin" className="flex items-center gap-2 text-blue-600 dark:text-blue-500 font-bold text-xl">
-            <Zap className="h-6 w-6" />
+        <div className="md:hidden h-16 flex items-center justify-between px-6 border-b border-slate-200/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30">
+          <a href="/admin" className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-extrabold text-lg">
+            <Zap className="h-5 w-5" />
             <span>PowerPanel</span>
           </a>
-          <button className="text-neutral-500" onClick={() => setSidebarOpen(true)}>
+          <button className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-6 w-6" />
           </button>
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          {children}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10 z-10">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
