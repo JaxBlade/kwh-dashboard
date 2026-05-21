@@ -5,25 +5,25 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('Start seeding...')
 
-  // Create Settings
+  console.log('Seeding settings...');
   await prisma.settings.upsert({
-    where: { id: 'default' },
+    where: { id: "default" },
     update: {},
     create: {
-      id: 'default',
-      ratePerKwh: 1500,
-      adminFee: 50000,
-    },
-  })
+      id: "default",
+      ratePerKwh: 1500.0,
+      adminFee: 50000.0,
+    }
+  });
 
-  // Create Admin
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@gedung.com' },
+  console.log('Seeding Admin user...');
+  await prisma.user.upsert({
+    where: { email: 'admin@bms.com' },
     update: {},
     create: {
       name: 'Super Admin',
-      email: 'admin@gedung.com',
-      password: 'password', // In real app, this should be hashed
+      email: 'admin@bms.com',
+      password: 'admin', // Simple password for demo
       role: 'ADMIN',
     },
   })
