@@ -53,9 +53,9 @@ export default function BillingClient({ initialInvoices }: { initialInvoices: an
     
     // Tenant Info
     doc.text(`Ditujukan kepada:`, 140, 45);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text(invoice.tenant, 140, 52);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.text(`Periode Tagihan: ${invoice.period}`, 140, 59);
 
     // Table Data
@@ -82,14 +82,14 @@ export default function BillingClient({ initialInvoices }: { initialInvoices: an
     
     // Total Amount
     doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text(`TOTAL TAGIHAN: Rp ${invoice.amount.toLocaleString('id-ID')}`, 14, finalY + 15);
     
     doc.setFontSize(10);
-    doc.setFont(undefined, 'italic');
+    doc.setFont('helvetica', 'italic');
     doc.text(`Status: ${invoice.status === 'PAID' ? 'LUNAS' : 'BELUM LUNAS'}`, 14, finalY + 22);
 
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.text("Harap melakukan pembayaran sebelum tanggal 10 bulan depan.", 105, 280, { align: "center" });
 
     doc.save(`${invoice.no}.pdf`);
