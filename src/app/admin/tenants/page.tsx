@@ -1,40 +1,48 @@
-"use client";
+import prisma from "@/lib/prisma";
+import TenantsClient from "./tenants-client";
 
-import { useState, useEffect } from "react";
-import { Search, Plus, MoreVertical, Building } from "lucide-react";
+export const dynamic = 'force-dynamic';
 
-export default function TenantsPage() {
-  const [mounted, setMounted] = useState(false);
+export default async function TenantsPage() {
+  // Fetch all tenants
+  const tenants = await prisma.user.findMany({
+    where: {
+      role: 'TENANT'
+    },
+    include: {
+      meters: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Fetch available meters (not assigned to any tenant yet)
+  const availableMeters = await prisma.meter.findMany({
+    where: {
+      userId: null
+    },
+    orderBy: {
+      floor: 'asc'
+    }
+  });
 
-  if (!mounted) return null;
+  // Map the tenants data for the client
+  const mappedTenants = tenants.map(tenant => ({
+    id: tenant.id,
+    name: tenant.name,
+    email: tenant.email,
+    password: tenant.password, // Only for demo purposes to show in connection guide
+    metersCount: tenant.meters.length,
+    assignedMeters: tenant.meters.map(m => m.id).join(", "),
+    status: "AKTIF",
+    joinDate: tenant.createdAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  }));
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Manajemen Tenant</h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1">Kelola daftar perusahaan penyewa yang menempati lantai gedung.</p>
-        </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-sm">
-          <Plus className="h-4 w-4" />
-          Tambah Tenant Baru
-        </button>
-      </div>
+  const mappedAvailableMeters = availableMeters.map(m => ({
+    id: m.id,
+    floor: m.floor
+  }));
 
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm p-8 text-center">
-        <Building className="h-16 w-16 text-neutral-300 dark:text-neutral-700 mx-auto mb-4" />
-        <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Modul Manajemen Tenant Aktif</h3>
-        <p className="text-neutral-500 dark:text-neutral-400 max-w-md mx-auto mt-2 mb-6">
-          Gunakan modul ini untuk menghubungkan meteran fisik (Modbus) dengan akun pengguna (Tenant) agar mereka dapat mengakses portal pribadi mereka.
-        </p>
-        <button className="px-6 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-medium rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
-          Lihat Panduan Koneksi
-        </button>
-      </div>
-    </div>
-  );
+  return <TenantsClient initialTenants={mappedTenants} availableMeters={mappedAvailableMeters} />;
 }
