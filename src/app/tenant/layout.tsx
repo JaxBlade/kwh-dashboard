@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Home, 
@@ -15,6 +14,7 @@ import {
   UserCircle
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { logoutAction } from "../actions/logout";
 
 const navigation = [
   { name: 'Dashboard Unit', href: '/tenant', icon: Home },
@@ -108,13 +108,15 @@ export default function TenantLayout({
               {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             </button>
           )}
-          <a
-            href="/"
-            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-            Logout
-          </a>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </button>
+          </form>
         </div>
       </div>
 

@@ -12,12 +12,19 @@ model User {
   name      String
   email     String   @unique
   password  String
-  role      String   @default("TENANT") // ADMIN, TENANT
+  role      Role   @default(TENANT) // ADMIN, TENANT
+ 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   meters    Meter[]
   invoices  Invoice[]
+}
+
+
+ enum Role {
+  ADMIN
+  TENANT
 }
 
 model Meter {

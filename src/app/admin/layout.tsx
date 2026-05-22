@@ -16,6 +16,7 @@ import {
   Zap
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { logoutAction } from "../actions/logout";
 
 const navigation = [
   { name: 'Overview', href: '/admin', icon: LayoutDashboard },
@@ -101,13 +102,15 @@ export default function AdminLayout({
               {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             </button>
           )}
-          <a
-            href="/"
-            className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all duration-200 group"
-          >
-            <LogOut className="h-5 w-5 text-rose-500/70 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors" />
-            Logout
-          </a>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all duration-200 group"
+            >
+              <LogOut className="h-5 w-5 text-rose-500/70 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors" />
+              Logout
+            </button>
+          </form>
         </div>
       </div>
 
