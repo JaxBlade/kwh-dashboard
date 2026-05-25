@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Zap, ArrowRight, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { loginUser } from "./actions/auth";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -70,7 +71,12 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Kata Sandi</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Kata Sandi</label>
+                <Link href="/forgot-password" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
+                  Lupa Kata Sandi?
+                </Link>
+              </div>
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 

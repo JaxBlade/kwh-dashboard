@@ -25,6 +25,7 @@ async function main() {
       email: 'admin@bms.com',
       password: 'admin', // Simple password for demo
       role: 'ADMIN',
+      isEmailVerified: true,
     },
   })
 
@@ -37,6 +38,7 @@ async function main() {
       email: 'tenant1@gmail.com',
       password: 'password',
       role: 'TENANT',
+      isEmailVerified: true,
     },
   })
 
@@ -48,6 +50,7 @@ async function main() {
       email: 'tenant2@gmail.com',
       password: 'password',
       role: 'TENANT',
+      isEmailVerified: true,
     },
   })
 

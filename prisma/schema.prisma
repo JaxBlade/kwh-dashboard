@@ -13,6 +13,11 @@ model User {
   email     String   @unique
   password  String
   role      Role   @default(TENANT) // ADMIN, TENANT
+  
+  isEmailVerified      Boolean  @default(false)
+  verificationToken    String?  @unique
+  resetPasswordToken   String?  @unique
+  resetPasswordExpires DateTime?
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
