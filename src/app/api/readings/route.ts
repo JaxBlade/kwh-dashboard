@@ -39,10 +39,7 @@ export async function POST(request: Request) {
     const reading = await prisma.meterReading.create({
       data: {
         meterId,
-        kwh: parseFloat(kwh),
-        voltage: voltage ? parseFloat(voltage) : 0,
-        current: current ? parseFloat(current) : 0,
-        power: power ? parseFloat(power) : 0,
+        kwhValue: parseFloat(kwh),
       }
     });
 

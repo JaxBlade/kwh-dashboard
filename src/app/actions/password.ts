@@ -3,7 +3,8 @@
 import prisma from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 import crypto from "crypto";
-import { hash } from "bcrypt"; // Wait, we are not using bcrypt, the previous implementation just used plain text comparison. 
+import bcrypt from "bcryptjs"; 
+// Wait, we are not using bcrypt, the previous implementation just used plain text comparison. 
 // Let's stick to the existing plain text or whatever is used. Actually, let's look at how auth.ts does it.
 // Auth.ts does: user.password !== password.
 // Okay, we'll keep it plain text for now, or just save whatever is given since this is a demo.
