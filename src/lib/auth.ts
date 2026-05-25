@@ -36,13 +36,17 @@ export async function login(user: { id: string; email: string; role: string; nam
     expires, 
     httpOnly: true, 
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax"
+    sameSite: "lax",
+    path: "/"
   });
 }
 
 export async function logout() {
   const cookieStore = await cookies();
-  cookieStore.delete("session");
+  cookieStore.delete({
+    name: "session",
+    path: "/"
+  });
 }
 
 export async function getSession() {
