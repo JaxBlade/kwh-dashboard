@@ -10,14 +10,41 @@ import {
   Tooltip, 
   ResponsiveContainer,
 } from "recharts";
-import { Zap, DollarSign, Calendar, Activity } from "lucide-react";
+import { Zap, DollarSign, Calendar, Activity, Loader2 } from "lucide-react";
+import { getChartData } from "@/app/actions/chart";
 
 export default function TenantClient({ summary }: { summary: any }) {
   const [mounted, setMounted] = useState(false);
+  const [timeRange, setTimeRange] = useState<"24h" | "7d" | "30d">("24h");
+  const [chartData, setChartData] = useState(summary.chartData);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    async function updateChart() {
+      if (timeRange === "24h" && summary.chartData.length > 0) {
+        // use initial data
+      }
+      if (!summary.meterIds || summary.meterIds.length === 0) return;
+
+      setIsLoading(true);
+      try {
+        const newData = await getChartData(summary.meterIds, timeRange);
+        setChartData(newData);
+      } catch (error) {
+        console.error("Failed to fetch chart data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (mounted) {
+      updateChart();
+    }
+  }, [timeRange, summary.meterIds, mounted]);
 
   if (!mounted) return null;
 
@@ -83,15 +110,35 @@ export default function TenantClient({ summary }: { summary: any }) {
 
       {/* Hourly Chart */}
       <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
             <Activity className="h-5 w-5 text-emerald-500" />
-            Grafik Konsumsi (Terbaru)
+            Grafik Konsumsi Historis
           </h3>
+          <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
+            {['24h', '7d', '30d'].map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range as "24h"|"7d"|"30d")}
+                className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                  timeRange === range 
+                    ? 'bg-white dark:bg-neutral-700 text-emerald-600 dark:text-emerald-400 shadow-sm' 
+                    : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+                }`}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="h-[350px] w-full">
+        <div className="h-[350px] w-full relative">
+          {isLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm rounded-xl">
+              <Loader2 className="h-8 w-8 text-emerald-600 animate-spin" />
+            </div>
+          )}
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={summary.chartData} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
+            <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.15} />
               <XAxis 
                 dataKey="time" 

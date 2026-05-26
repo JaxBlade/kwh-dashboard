@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import TenantClient from "./tenant-client";
 import { redirect } from "next/navigation";
+import { getChartData } from "@/app/actions/chart";
 
 export const dynamic = 'force-dynamic';
 
@@ -63,26 +64,8 @@ export default async function TenantOverview() {
       }
     }
 
-    // Prepare chart data (24 hours dummy or real)
-    // For simplicity, we just use the latest 24 readings across all meters
-    const latestReadings = await prisma.meterReading.findMany({
-      where: { meterId: { in: meterIds } },
-      orderBy: { timestamp: 'desc' },
-      take: 24
-    });
-
-    if (latestReadings.length > 0) {
-      chartData = latestReadings.reverse().map(r => ({
-        time: r.timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-        kwh: r.kwhValue
-      }));
-    } else {
-      // Dummy fallback if no readings
-      chartData = Array.from({ length: 24 }).map((_, i) => ({
-        time: `${i}:00`,
-        kwh: Math.floor(Math.random() * 5) + 5,
-      }));
-    }
+    // Prepare initial 24h chart data using Server Action
+    chartData = await getChartData(meterIds, "24h");
   } else {
     // Dummy chart if no meters assigned
     chartData = Array.from({ length: 24 }).map((_, i) => ({
@@ -99,7 +82,8 @@ export default async function TenantOverview() {
     estimatedBill,
     adminFee,
     nextDueDate: `10 ${nextMonth.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`,
-    chartData
+    chartData,
+    meterIds
   };
 
   return <TenantClient summary={summary} />;

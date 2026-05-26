@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { getChartData } from "@/app/actions/chart";
 import MeterDetailClient from "./meter-detail-client";
 
 export const dynamic = 'force-dynamic';
@@ -50,25 +51,8 @@ export default async function MeterDetail({ params }: { params: Promise<{ id: st
     currentUsage = max - min;
   }
 
-  // 4. Fetch last 24 readings for chart (hourly movement)
-  const latestReadings = await prisma.meterReading.findMany({
-    where: { meterId: id },
-    orderBy: { timestamp: 'desc' },
-    take: 24
-  });
-
-  let chartData: any[] = [];
-  if (latestReadings.length > 0) {
-    chartData = latestReadings.reverse().map(r => ({
-      time: r.timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-      kwh: r.kwhValue
-    }));
-  } else {
-    chartData = Array.from({ length: 24 }).map((_, i) => ({
-      time: `${i}:00`,
-      kwh: 0,
-    }));
-  }
+  // 4. Fetch initial 24h chart data using Server Action
+  const chartData = await getChartData([id], "24h");
 
   const estimatedCost = (currentUsage * ratePerKwh) + (meter.userId ? adminFee : 0);
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Zap, ArrowLeft, Building2, UserCircle2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Zap, ArrowLeft, Building2, UserCircle2, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { getChartData } from "@/app/actions/chart";
 
 type MeterSummary = {
   id: string;
@@ -16,7 +17,32 @@ type MeterSummary = {
 };
 
 export default function MeterDetailClient({ summary }: { summary: MeterSummary }) {
-  const [timeRange, setTimeRange] = useState("24h");
+  const [timeRange, setTimeRange] = useState<"24h" | "7d" | "30d">("24h");
+  const [chartData, setChartData] = useState(summary.chartData);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function updateChart() {
+      if (timeRange === "24h" && summary.chartData.length > 0) {
+        // We already have initial 24h data from server
+        // but if they click it again after 7d, we can re-fetch or use cache
+      }
+      
+      setIsLoading(true);
+      try {
+        const newData = await getChartData([summary.id], timeRange);
+        setChartData(newData);
+      } catch (error) {
+        console.error("Failed to fetch chart data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    // Only fetch if it's not the initial render (which is 24h)
+    // Actually, simple way: fetch every time it changes
+    updateChart();
+  }, [timeRange, summary.id]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -120,7 +146,7 @@ export default function MeterDetailClient({ summary }: { summary: MeterSummary }
             {['24h', '7d', '30d'].map((range) => (
               <button
                 key={range}
-                onClick={() => setTimeRange(range)}
+                onClick={() => setTimeRange(range as "24h"|"7d"|"30d")}
                 className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
                   timeRange === range 
                     ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
@@ -133,9 +159,14 @@ export default function MeterDetailClient({ summary }: { summary: MeterSummary }
           </div>
         </div>
 
-        <div className="h-[400px] w-full">
+        <div className="h-[400px] w-full relative">
+          {isLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl">
+              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+            </div>
+          )}
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={summary.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorKwhAdmin" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
