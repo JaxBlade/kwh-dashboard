@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, CheckCircle2, AlertCircle, X } from "lucide-react";
+import { Search, Filter, CheckCircle2, AlertCircle, X, ChevronRight, Activity } from "lucide-react";
+import Link from "next/link";
 
 type MeterType = {
   id: string;
@@ -105,13 +106,18 @@ export default function MetersClient({ initialMeters }: { initialMeters: MeterTy
                 <th className="px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">Status Modbus</th>
                 <th className="px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">Total kWh Terakhir</th>
                 <th className="px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">Update Terakhir</th>
+                <th className="px-6 py-4 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
               {filteredMeters.length > 0 ? (
                 filteredMeters.map((meter) => (
-                  <tr key={meter.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{meter.id}</td>
+                  <tr key={meter.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">
+                      <Link href={`/admin/meters/${meter.id}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                        {meter.id}
+                      </Link>
+                    </td>
                     <td className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-300">Lantai {meter.floor}</td>
                     <td className="px-6 py-4">
                       {meter.tenant ? (
@@ -141,11 +147,20 @@ export default function MetersClient({ initialMeters }: { initialMeters: MeterTy
                     <td className="px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-xs">
                       {meter.lastUpdate}
                     </td>
+                    <td className="px-6 py-4 text-right">
+                      <Link 
+                        href={`/admin/meters/${meter.id}`}
+                        className="inline-flex items-center justify-center p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-indigo-500 transition-all shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                        title="Lihat Detail Grafik"
+                      >
+                        <Activity className="h-4 w-4" />
+                      </Link>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                     <AlertCircle className="h-8 w-8 mx-auto mb-3 text-slate-300 dark:text-slate-600" />
                     <p className="font-semibold text-base">Tidak ada meteran yang cocok</p>
                     <p className="text-sm mt-1">Coba ubah kata kunci atau filter pencarian Anda.</p>
