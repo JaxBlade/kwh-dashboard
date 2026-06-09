@@ -84,11 +84,11 @@ export async function getAdminDashboardStats() {
 
   // Monthly data mock
   const monthlyData = [
-    { name: 'Jan', value: 4000 },
-    { name: 'Feb', value: 3800 },
-    { name: 'Mar', value: 4200 },
-    { name: 'Apr', value: 4500 },
-    { name: 'Mei', value: parseFloat((totalKwhToday * 30).toFixed(1)) },
+    { name: 'Jan', value: 4000, kw: 120 },
+    { name: 'Feb', value: 3800, kw: 110 },
+    { name: 'Mar', value: 4200, kw: 130 },
+    { name: 'Apr', value: 4500, kw: 135 },
+    { name: 'Mei', value: parseFloat((totalKwhToday * 30).toFixed(1)), kw: parseFloat(totalKwNow.toFixed(1)) },
   ];
 
   return {

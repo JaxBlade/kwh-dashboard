@@ -209,24 +209,48 @@ export default function OverviewClient({ stats }: { stats: any }) {
 
         </div>
 
-        {/* Monthly Chart */}
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Tren 5 Bulan Terakhir</h3>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.monthlyData} margin={{ top: 5, right: 0, bottom: 5, left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.15} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                <Tooltip 
-                  cursor={{ fill: 'rgba(79, 70, 229, 0.05)' }}
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)', color: '#fff' }}
-                  itemStyle={{ color: '#fff', fontWeight: 'bold' }}
-                  formatter={(value) => [`${value} kWh`, 'Pemakaian']}
-                />
-                <Bar dataKey="value" fill="#6366f1" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+        {/* Monthly Charts Stack */}
+        <div className="space-y-6">
+          {/* Monthly kWh Chart */}
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Tren Konsumsi (5 Bulan)</h3>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.monthlyData} margin={{ top: 5, right: 0, bottom: 5, left: -20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.15} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(79, 70, 229, 0.05)' }}
+                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)', color: '#fff' }}
+                    itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    formatter={(value) => [`${value} kWh`, 'Pemakaian']}
+                  />
+                  <Bar dataKey="value" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Monthly kW Chart */}
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Beban Puncak (5 Bulan)</h3>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.monthlyData} margin={{ top: 5, right: 0, bottom: 5, left: -20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.15} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(245, 158, 11, 0.05)' }}
+                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)', color: '#fff' }}
+                    itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    formatter={(value) => [`${value} kW`, 'Beban Puncak']}
+                  />
+                  <Bar dataKey="kw" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>
