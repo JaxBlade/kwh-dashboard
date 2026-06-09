@@ -20,7 +20,8 @@ export async function POST(request: Request) {
 
     // 2. Parse Body JSON dari Node-RED
     const body = await request.json();
-    const { meterId, kwh, voltage, current, power } = body;
+    const { meterId, kwh, kw, power } = body;
+    const activePower = kw !== undefined ? kw : (power !== undefined ? power : 0);
 
     if (!meterId || kwh === undefined) {
       return NextResponse.json({ error: "Bad Request: meterId dan kwh wajib diisi" }, { status: 400 });
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
       data: {
         meterId,
         kwhValue: parseFloat(kwh),
+        kwValue: parseFloat(activePower),
       }
     });
 

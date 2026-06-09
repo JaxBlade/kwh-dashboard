@@ -50,6 +50,7 @@ model MeterReading {
   meterId   String
   meter     Meter    @relation(fields: [meterId], references: [id])
   kwhValue  Float
+  kwValue   Float    @default(0)
   timestamp DateTime @default(now())
 
   @@index([meterId, timestamp])

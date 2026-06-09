@@ -14,6 +14,7 @@ export async function getAdminDashboardStats() {
   const meters = await prisma.meter.findMany();
   
   let totalKwhToday = 0;
+  let totalKwNow = 0;
   let activeMetersCount = 0;
   let anomalyCount = 0;
 
@@ -34,6 +35,10 @@ export async function getAdminDashboardStats() {
       const firstReading = readingsToday[0].kwhValue;
       const lastReading = readingsToday[readingsToday.length - 1].kwhValue;
       totalKwhToday += (lastReading - firstReading);
+    }
+    
+    if (readingsToday.length > 0) {
+      totalKwNow += readingsToday[readingsToday.length - 1].kwValue;
     }
   }
 
@@ -68,10 +73,12 @@ export async function getAdminDashboardStats() {
     // Since our dummy seeder adds random values, we can just sum the delta.
     // For simplicity of the demo, let's just simulate the hourly usage based on total today
     const simulatedHourlyUsage = Math.max(0, totalKwhToday / 24 + (Math.random() * 10 - 5));
+    const simulatedKw = Math.max(0, totalKwNow + (Math.random() * 20 - 10));
     
     hourlyData.push({
       time: `${hourStart.getHours()}:00`,
-      kwh: parseFloat(simulatedHourlyUsage.toFixed(1))
+      kwh: parseFloat(simulatedHourlyUsage.toFixed(1)),
+      kw: parseFloat(simulatedKw.toFixed(1))
     });
   }
 
@@ -86,6 +93,7 @@ export async function getAdminDashboardStats() {
 
   return {
     totalKwhToday: parseFloat(totalKwhToday.toFixed(1)),
+    totalKwNow: parseFloat(totalKwNow.toFixed(1)),
     estimatedBill,
     activeMetersCount,
     totalMetersCount: meters.length,

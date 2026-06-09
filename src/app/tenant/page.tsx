@@ -35,7 +35,7 @@ export default async function TenantOverview() {
   const meterIds = user.meters.map(m => m.id);
 
   let currentMonthUsage = 0;
-  let lastMonthUsage = 0; // For comparison
+  let currentKw = 0;
   let chartData: any[] = [];
 
   if (meterIds.length > 0) {
@@ -63,6 +63,14 @@ export default async function TenantOverview() {
         currentMonthUsage += (max - min);
       }
     }
+    
+    for (const mId of meterIds) {
+      const last = await prisma.meterReading.findFirst({
+        where: { meterId: mId },
+        orderBy: { timestamp: 'desc' }
+      });
+      if (last) currentKw += last.kwValue;
+    }
 
     // Prepare initial 24h chart data using Server Action
     chartData = await getChartData(meterIds, "24h");
@@ -79,6 +87,7 @@ export default async function TenantOverview() {
   const summary = {
     name: user.name,
     currentUsage: parseFloat(currentMonthUsage.toFixed(2)),
+    currentKw: parseFloat(currentKw.toFixed(2)),
     estimatedBill,
     adminFee,
     nextDueDate: `10 ${nextMonth.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`,

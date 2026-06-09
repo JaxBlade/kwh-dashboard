@@ -1,12 +1,13 @@
 async function simulate() {
   console.log("Mengirim data simulasi ke localhost:3000/api/readings...");
   
+  const randomKw = Math.floor(Math.random() * 50) + 10; // Random kw between 10 and 60
   const payload = {
     meterId: "M-001",
-    kwh: 100,
+    kwh: 100 + randomKw / 100, // Just a dummy cumulative kwh
     voltage: 220,
     current: 4.5,
-    power: 990
+    kw: randomKw
   };
 
   try {

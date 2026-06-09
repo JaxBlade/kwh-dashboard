@@ -45,10 +45,12 @@ export default async function MeterDetail({ params }: { params: Promise<{ id: st
   });
 
   let currentUsage = 0;
+  let currentKw = 0;
   if (currentMonthReadings.length > 0) {
     const min = currentMonthReadings[0].kwhValue;
     const max = currentMonthReadings[currentMonthReadings.length - 1].kwhValue;
     currentUsage = max - min;
+    currentKw = currentMonthReadings[currentMonthReadings.length - 1].kwValue;
   }
 
   // 4. Fetch initial 24h chart data using Server Action
@@ -62,6 +64,7 @@ export default async function MeterDetail({ params }: { params: Promise<{ id: st
     status: meter.status,
     tenantName: meter.user?.name || null,
     currentUsage: parseFloat(currentUsage.toFixed(2)),
+    currentKw: parseFloat(currentKw.toFixed(2)),
     estimatedCost,
     chartData,
   };

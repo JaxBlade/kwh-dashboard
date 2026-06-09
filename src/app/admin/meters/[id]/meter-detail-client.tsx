@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Zap, ArrowLeft, Building2, UserCircle2, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Zap, ArrowLeft, Building2, UserCircle2, CheckCircle2, AlertCircle, Loader2, Activity } from "lucide-react";
 import Link from "next/link";
 import { getChartData } from "@/app/actions/chart";
 
@@ -12,6 +12,7 @@ type MeterSummary = {
   status: string;
   tenantName: string | null;
   currentUsage: number;
+  currentKw: number;
   estimatedCost: number;
   chartData: any[];
 };
@@ -62,7 +63,7 @@ export default function MeterDetailClient({ summary }: { summary: MeterSummary }
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 p-6 rounded-2xl shadow-sm">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lokasi Lantai</h3>
@@ -109,6 +110,24 @@ export default function MeterDetailClient({ summary }: { summary: MeterSummary }
           </div>
         </div>
 
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 p-6 rounded-2xl shadow-sm relative overflow-hidden group">
+          <div className="absolute -right-6 -top-6 text-amber-500/10 dark:text-amber-400/5 transition-transform duration-500 group-hover:scale-110">
+            <Activity className="h-32 w-32" />
+          </div>
+          <div className="relative">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Beban Aktif</h3>
+              <div className="p-2.5 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl">
+                <Activity className="h-5 w-5" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 dark:text-white">{summary.currentKw}</span>
+              <span className="text-sm font-bold text-slate-500">kW</span>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-6 rounded-2xl shadow-lg relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex items-center justify-between">
@@ -136,79 +155,144 @@ export default function MeterDetailClient({ summary }: { summary: MeterSummary }
       </div>
 
       {/* Chart Section */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Grafik Pergerakan kWh</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Pantauan penggunaan meteran dalam 24 jam terakhir</p>
+      <div className="space-y-6">
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Konsumsi Energi (kWh)</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Pantauan penggunaan energi historis</p>
+            </div>
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+              {['24h', '7d', '30d'].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range as "24h"|"7d"|"30d")}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                    timeRange === range 
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-            {['24h', '7d', '30d'].map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range as "24h"|"7d"|"30d")}
-                className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                  timeRange === range 
-                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                {range}
-              </button>
-            ))}
+
+          <div className="h-[250px] w-full relative">
+            {isLoading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl">
+                <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+              </div>
+            )}
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorKwhAdmin" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+                <XAxis 
+                  dataKey="time" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
+                  dx={-10}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontWeight: 600
+                  }}
+                  itemStyle={{ color: '#818cf8', fontWeight: 700 }}
+                  formatter={(value) => [`${value} kWh`, 'Konsumsi']}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="kwh" 
+                  stroke="#4f46e5" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorKwhAdmin)" 
+                  animationDuration={1500}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="h-[400px] w-full relative">
-          {isLoading && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl">
-              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Beban Daya Aktif (kW)</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Pantauan fluktuasi beban listrik historis</p>
             </div>
-          )}
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorKwhAdmin" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-              <XAxis 
-                dataKey="time" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
-                dy={10}
-              />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
-                dx={-10}
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                  backdropFilter: 'blur(8px)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '12px',
-                  color: '#fff',
-                  fontWeight: 600
-                }}
-                itemStyle={{ color: '#818cf8', fontWeight: 700 }}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="kwh" 
-                stroke="#4f46e5" 
-                strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorKwhAdmin)" 
-                animationDuration={1500}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          </div>
+
+          <div className="h-[250px] w-full relative">
+            {isLoading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl">
+                <Loader2 className="h-8 w-8 text-amber-600 animate-spin" />
+              </div>
+            )}
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorKwAdmin" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+                <XAxis 
+                  dataKey="time" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
+                  dx={-10}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontWeight: 600
+                  }}
+                  itemStyle={{ color: '#fbbf24', fontWeight: 700 }}
+                  formatter={(value) => [`${value} kW`, 'Beban Daya']}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="kw" 
+                  stroke="#f59e0b" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorKwAdmin)" 
+                  animationDuration={1500}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>

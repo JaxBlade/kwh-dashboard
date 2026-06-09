@@ -7,6 +7,7 @@ export async function getChartData(meterIds: string[], range: "24h" | "7d" | "30
     return Array.from({ length: 24 }).map((_, i) => ({
       time: `${i}:00`,
       kwh: 0,
+      kw: 0,
     }));
   }
 
@@ -34,6 +35,7 @@ export async function getChartData(meterIds: string[], range: "24h" | "7d" | "30
     return Array.from({ length: 24 }).map((_, i) => ({
       time: `${i}:00`,
       kwh: 0,
+      kw: 0,
     }));
   }
 
@@ -71,7 +73,8 @@ export async function getChartData(meterIds: string[], range: "24h" | "7d" | "30
 
     return {
       time: timeLabel,
-      kwh: r.kwhValue
+      kwh: r.kwhValue,
+      kw: r.kwValue
     };
   });
 
